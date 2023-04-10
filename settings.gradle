@@ -1,4 +1,4 @@
-rootProject.name = 'tcp-calculator-acumulator'
+rootProject.name = 'tcp-calculator-threading'
 include 'server'
 include 'client'
 
