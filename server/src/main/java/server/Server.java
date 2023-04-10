@@ -1,7 +1,6 @@
 package server;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
@@ -44,17 +43,16 @@ public class Server {
         while (true) {
             System.out.println("Listening...");
             final var clientSocket = socket.accept();
-            final var clientAddress = clientSocket.getInetAddress();
-            System.out.println("Accepted connection with client" + clientAddress);
-            new Thread(() -> handleNewConnection(clientSocket, clientAddress)).start();
+            new Thread(() -> handleNewConnection(clientSocket)).start();
         }
     }
 
     private void handleNewConnection(
-            final Socket clientSocket,
-            final InetAddress clientAddress
+            final Socket clientSocket
     ) {
         final var accumulator = new Accumulator(0);
+        final var info = "[IP '" + clientSocket.getInetAddress() + "', Port '" + clientSocket.getPort() + "'] ";
+        System.out.println(info + "connection accepted!");
         try (
                 final var in = clientSocket.getInputStream();
                 final var out = clientSocket.getOutputStream()
@@ -66,25 +64,25 @@ public class Server {
                 if (decode.isPresent()) {
                     final var operation = decode.get();
 
-                    System.out.println("Received from client: " + operation.toReadableFormat());
+                    System.out.println(info + "Received from client the operation: " + operation.toReadableFormat());
                     final var solution = operation.solve();
-                    System.out.println("Solved: " + operation.toReadableFormat() + " = " + solution);
+                    System.out.println(info + "Solved: " + operation.toReadableFormat() + " = " + solution);
 
                     final var before = accumulator.getValue();
                     accumulator.accumulate(solution);
-                    System.out.println("Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
+                    System.out.println(info + "Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
 
                     out.write(answerEncoder.encode(accumulator.getValue()));
-                    System.out.println("Answered: " + accumulator);
+                    System.out.println(info + "Answered: " + accumulator);
                 } else {
                     out.write(answerEncoder.encode(0));
-                    System.out.println("Answered with a 0 due to invalid input.");
+                    System.out.println(info + "Answered with a 0 due to invalid input.");
                 }
             }
         } catch (IOException e) {
-            System.out.println("IOException with client " + clientAddress + " reason:" + e.getMessage());
+            System.out.println(info + "IOException with client reason:" + e.getMessage());
         } finally {
-            System.out.println("Connection closed with client " + clientAddress);
+            System.out.println(info + "Connection closed with client.");
         }
     }
 
