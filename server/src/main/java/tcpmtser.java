@@ -3,13 +3,13 @@ import server.Server;
 import server.ServerParameters;
 import server.encoder.AnswerEncoder;
 
-public class tcp1ser {
+public class tcpmtser {
     public static void main(String[] args) {
         ServerParameters
                 .parse(args)
                 .ifPresentOrElse(
-                        tcp1ser::listen,
-                        tcp1ser::printInstructions
+                        tcpmtser::listen,
+                        tcpmtser::printInstructions
                 );
     }
 
@@ -21,12 +21,12 @@ public class tcp1ser {
     private static void printInstructions() {
         System.out.println();
         System.out.println("Correct format is:");
-        System.out.println("tcp1ser <server_port>");
+        System.out.println("tcpmtser <server_port>");
         System.out.println();
         System.out.println("\t<server_port> must be an unused TCP port.");
         System.out.println();
         System.out.println("Example:");
-        System.out.println("tcp1ser 8081");
-        System.out.println("java tcp1ser 8081");
+        System.out.println("tcpmtser 8081");
+        System.out.println("java tcpmtser 8081");
     }
 }
