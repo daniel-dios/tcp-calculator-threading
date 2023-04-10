@@ -68,9 +68,10 @@ Por ejemplo [1,2,120,54] debería dar como resultado 174, [5,2,11,3] debería da
 ### Respuestas del Servidor 
 El formato de las respuesta del servidor es el siguiente:
 
-tipo	longitud	valor	Comentario
-10	variable	Uno o más campos TLV	Una respuesta conteniendo un valor del acumulador o un mensaje de error
-11	variable	String UTF-8	Un mensaje de error si el cálculo no pudo ser realizado
-16	8	entero de 64 bits con signo     	Un valor del acumulador que se representa como un entero de 64 bits con signo en formato big-endian ([-2⁶³,2⁶³-1]).
+|tipo	|longitud	|valor	|Comentario|
+|-----|---------|-------|-----------|
+|10|	variable	| Uno o más campos TLV	|Una respuesta conteniendo un valor del acumulador o un mensaje de error |
+|11|	variable |	String UTF-8	| Un mensaje de error si el cálculo no pudo ser realizado |
+|16|	8 |	entero de 64 bits con signo |    	Un valor del acumulador que se representa como un entero de 64 bits con signo en formato big-endian ([-2⁶³,2⁶³-1]).|
 
 Por ejemplo, si el servidor tiene que enviar al cliente un valor del acumulador igual a -525, el mensaje se codificaría como: [10,10,16,8,255,255,255,255,255,255,253,243]. Y si el valor a devolver fuese el mensaje de error “Can not divide by 0”, y el valor del acumulador fuese 5, el mensaje sería, o bien [10,31,11,19,67,97,110,32,110,111,116,32,100,105,118,105,100,101,32,98,121,32,48,16,8,0,0,0,0,0,0,0,5] o bien [10,31,16,8,0,0,0,0,0,0,0,5,11,19,67,97,110,32,110,111,116,32,100,105,118,105,100,101,32,98,121,32,48], es decir, el orden del mensaje de error y del valor del acumulador dentro de la respuesta no importa.
