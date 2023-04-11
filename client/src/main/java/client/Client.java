@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.Scanner;
 
@@ -75,13 +76,16 @@ public class Client {
             }
 
             try {
-                final var buffer = new byte[10];
-                if (dataInputStream.read(buffer) != FINISH_SIG) {
-                    System.out.println("Answer from server: " + answerDecoder.decode(buffer));
-                } else {
-                    System.out.println("Server unreachable.");
-                    break;
-                }
+                final var firstType = dataInputStream.readByte();
+                final var size = dataInputStream.readByte();
+                final var payload = dataInputStream.readNBytes(size);
+                final var buffer = ByteBuffer.allocate(2 + size)
+                        .put(firstType)
+                        .put(size)
+                        .put(payload)
+                        .array();
+                System.out.println("Answer from server: " + answerDecoder.decodeVariable(buffer));
+
             } catch (IOException e) {
                 System.out.println("Problem reading.");
             }
