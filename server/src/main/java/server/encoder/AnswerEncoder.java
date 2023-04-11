@@ -1,6 +1,7 @@
 package server.encoder;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static java.nio.ByteOrder.BIG_ENDIAN;
 
@@ -27,7 +28,26 @@ public class AnswerEncoder {
         return output;
     }
 
-    public int encodeFailure(final long value, final String reason) {
-        return 0;
+    public byte[] encodeFailure(
+            final long value,
+            final String text
+    ) {
+        final var accumulator = encodeSuccess(value);
+        final var reason = encodeMessage(text);
+        return ByteBuffer.allocate(2 + accumulator.length + reason.length)
+                .put((byte) 10)
+                .put((byte) (accumulator.length + reason.length))
+                .put(reason)
+                .put(accumulator)
+                .array();
+    }
+
+    private byte[] encodeMessage(final String reason) {
+        final var bytes = reason.getBytes(StandardCharsets.UTF_8);
+        return ByteBuffer.allocate(2 + bytes.length)
+                .put((byte) 11)
+                .put((byte) bytes.length)
+                .put(bytes)
+                .array();
     }
 }
