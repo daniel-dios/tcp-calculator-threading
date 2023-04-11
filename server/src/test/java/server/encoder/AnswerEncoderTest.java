@@ -25,7 +25,7 @@ class AnswerEncoderTest {
             final byte[] expected
     ) {
 
-        assertThat(answerEncoder.encode(input))
+        assertThat(answerEncoder.encodeSuccess(input))
                 .isEqualTo(expected);
     }
 }

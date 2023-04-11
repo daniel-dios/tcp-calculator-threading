@@ -12,7 +12,7 @@ public class AnswerEncoder {
     public final int CAPACITY_POSITION = 1;
     public final int VALUE_POSITION = 2;
 
-    public byte[] encode(final long value) {
+    public byte[] encodeSuccess(final long value) {
         final var valueInBigEndian = ByteBuffer.allocate(CAPACITY)
                 .order(BIG_ENDIAN)
                 .putLong(value)
@@ -25,5 +25,9 @@ public class AnswerEncoder {
         System.arraycopy(valueInBigEndian, ANSWER_TYPE_POSITION, output, VALUE_POSITION, CAPACITY);
 
         return output;
+    }
+
+    public int encodeFailure(final long value, final String reason) {
+        return 0;
     }
 }

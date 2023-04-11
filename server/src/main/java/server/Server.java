@@ -66,16 +66,26 @@ public class Server {
 
                     System.out.println(info + "Received from client the operation: " + operation.toReadableFormat());
                     final var solution = operation.solve();
-                    System.out.println(info + "Solved: " + operation.toReadableFormat() + " = " + solution);
+                    if (solution.success) {
+                        System.out.println(info + "Solved: " + operation.toReadableFormat() + " = " + solution);
 
-                    final var before = accumulator.getValue();
-                    accumulator.accumulate(solution);
-                    System.out.println(info + "Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
+                        final var before = accumulator.getValue();
+                        accumulator.accumulate(solution.result);
+                        System.out.println(info + "Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
 
-                    out.write(answerEncoder.encode(accumulator.getValue()));
-                    System.out.println(info + "Answered: " + accumulator);
+                        out.write(answerEncoder.encodeSuccess(accumulator.getValue()));
+                        System.out.println(info + "Answered: " + accumulator);
+                    } else {
+                        System.out.println(info + "Problem solving: " + operation.toReadableFormat() + ", error: " + solution.reason);
+
+                        accumulator.accumulate(solution.result);
+                        System.out.println(info + "Accumulator was (didn't change): " + accumulator.getValue());
+
+                        out.write(answerEncoder.encodeFailure(accumulator.getValue(), solution.reason));
+                        System.out.println(info + "Answer sent: type 10 (type 16, value" + accumulator + "; type 11, reason:" + solution.reason);
+                    }
                 } else {
-                    out.write(answerEncoder.encode(0));
+                    out.write(answerEncoder.encodeFailure(accumulator.getValue(), "invalid input"));
                     System.out.println(info + "Answered with a 0 due to invalid input.");
                 }
             }

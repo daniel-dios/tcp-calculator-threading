@@ -2,7 +2,7 @@ package server.operation;
 
 public interface Operation {
 
-    long solve();
+    Result solve();
 
     String toReadableFormat();
 }

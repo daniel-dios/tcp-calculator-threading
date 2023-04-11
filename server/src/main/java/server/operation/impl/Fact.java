@@ -1,8 +1,7 @@
 package server.operation.impl;
 
 import server.operation.Operation;
-
-import static java.lang.Long.MAX_VALUE;
+import server.operation.Result;
 
 public class Fact implements Operation {
     private final byte a;
@@ -12,15 +11,18 @@ public class Fact implements Operation {
     }
 
     @Override
-    public long solve() {
+    public Result solve() {
+        if (a < 0) {
+            return Result.failure("Can't fact number < 0.");
+        }
+        if (a > 20) {
+            return Result.failure("Factorial overflow!");
+        }
         long start = 1;
         for (int i = 1; i <= a; i++) {
             start *= i;
-            if (start > MAX_VALUE / i) {
-                return MAX_VALUE;
-            }
         }
-        return start;
+        return Result.success(start);
     }
 
     @Override

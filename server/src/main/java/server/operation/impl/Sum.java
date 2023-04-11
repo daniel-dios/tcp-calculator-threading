@@ -1,6 +1,7 @@
 package server.operation.impl;
 
 import server.operation.Operation;
+import server.operation.Result;
 
 public class Sum implements Operation {
     private final byte a;
@@ -12,8 +13,8 @@ public class Sum implements Operation {
     }
 
     @Override
-    public long solve() {
-        return a + b;
+    public Result solve() {
+        return Result.success(a + b);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package server.operation.impl;
 
 import server.operation.Operation;
+import server.operation.Result;
 
 public class DivRest implements Operation {
     private final byte a;
@@ -12,11 +13,11 @@ public class DivRest implements Operation {
     }
 
     @Override
-    public long solve() {
+    public Result solve() {
         if (b == 0) {
-            return 0;
+            return Result.failure("Can't divide by 0.");
         }
-        return a % b;
+        return Result.success(a % b);
     }
 
     @Override
