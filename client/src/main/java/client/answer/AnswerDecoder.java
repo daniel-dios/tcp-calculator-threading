@@ -49,10 +49,10 @@ public class AnswerDecoder {
         // 19 --> [T,19,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,- ,-,-,-,- ,-  ,-  ,16,8,0,0,0,0,0,0,0,5]
 
         final var builder = new StringBuilder();
-        builder.append("Type 10 with message [");
+        builder.append("Type 10 with message [\n\t");
         for (int i = 0; i < data.length; ) {
             if (i != 0) {
-                builder.append(", ");
+                builder.append(",\n\t");
             }
             var value = data[i];
             var size = data[i + 1];
@@ -63,6 +63,6 @@ public class AnswerDecoder {
             }
             i = i + 2 + size;
         }
-        return builder.append("].").toString();
+        return builder.append("\n].").toString();
     }
 }

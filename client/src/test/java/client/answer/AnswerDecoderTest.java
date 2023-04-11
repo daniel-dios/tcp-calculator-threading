@@ -33,7 +33,7 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 10 with message [Type 11 with message [Can not divide by 0], Type 16 with accumulator [5]].");
+                .isEqualTo("Type 10 with message [\n\tType 11 with message [Can not divide by 0],\n\tType 16 with accumulator [5]\n].");
     }
 
     @Test
@@ -44,7 +44,7 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 10 with message [Type 16 with accumulator [5], Type 11 with message [Can not divide by 0]].");
+                .isEqualTo("Type 10 with message [\n\tType 16 with accumulator [5],\n\tType 11 with message [Can not divide by 0]\n].");
     }
 
     @Test
@@ -59,6 +59,6 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 10 with message [Type 11 with message [ab], Type 16 with accumulator [12], Type 16 with accumulator [5], Type 11 with message [cd], Type 11 with message [e]].");
+                .isEqualTo("Type 10 with message [\n\tType 11 with message [ab],\n\tType 16 with accumulator [12],\n\tType 16 with accumulator [5],\n\tType 11 with message [cd],\n\tType 11 with message [e]\n].");
     }
 }
