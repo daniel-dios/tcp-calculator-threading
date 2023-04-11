@@ -11,18 +11,18 @@ class AnswerDecoderTest {
 
     @Test
     void shouldDecodeType16() {
-        final byte[] answer = toByteArray( 255, 255, 255, 255, 255, 255, 253, 243);
+        final byte[] answer = toByteArray(255, 255, 255, 255, 255, 255, 253, 243);
 
         assertThat(answerDecoder.decodeNumber16(answer))
-                .isEqualTo("-525");
+                .isEqualTo("Type 16 with accumulator [-525]");
     }
 
     @Test
-    void shouldDecodeType10WithValue() {
-        byte[] answer = toByteArray( 16, 8, 255, 255, 255, 255, 255, 255, 253, 243);
+    void shouldDecodeType16WithValue() {
+        byte[] answer = toByteArray(16, 8, 255, 255, 255, 255, 255, 255, 253, 243);
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("-525");
+                .isEqualTo("Type 16 with accumulator [-525]");
     }
 
     @Test
@@ -33,7 +33,7 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Can not divide by 05");
+                .isEqualTo("Type 10 with message [Type 11 with message [Can not divide by 0], Type 16 with accumulator [5]].");
     }
 
     @Test
@@ -44,6 +44,21 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("5Can not divide by 0");
+                .isEqualTo("Type 10 with message [Type 16 with accumulator [5], Type 11 with message [Can not divide by 0]].");
+    }
+
+    @Test
+    void shouldGoRecursively() {
+        byte[] answer = toByteArray(
+                10, 31,
+                11, 2, 97, 98,
+                16, 8, 0, 0, 0, 0, 0, 0, 0, 12,
+                16, 8, 0, 0, 0, 0, 0, 0, 0, 5,
+                11, 2, 99, 100,
+                11, 1, 101
+        );
+
+        assertThat(answerDecoder.decodeVariable(answer))
+                .isEqualTo("Type 10 with message [Type 11 with message [ab], Type 16 with accumulator [12], Type 16 with accumulator [5], Type 11 with message [cd], Type 11 with message [e]].");
     }
 }

@@ -29,16 +29,14 @@ public class AnswerDecoder {
     }
 
     public String decodeNumber16(final byte[] buffer) {
-        return String.valueOf(
-                ByteBuffer
-                        .wrap(Arrays.copyOfRange(buffer, 0, buffer.length))
-                        .getLong()
-        );
+        return "Type 16 with accumulator [" + ByteBuffer
+                .wrap(Arrays.copyOfRange(buffer, 0, buffer.length))
+                .getLong() + "]";
     }
 
     private String decodeText11(final byte[] value) {
         try {
-            return StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(value)).toString();
+            return "Type 11 with message [" + StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(value)) + "]";
         } catch (IllegalStateException | CharacterCodingException e) {
             return "Message is not UTF encoded";
         }
@@ -51,20 +49,20 @@ public class AnswerDecoder {
         // 19 --> [T,19,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,- ,-,-,-,- ,-  ,-  ,16,8,0,0,0,0,0,0,0,5]
 
         final var builder = new StringBuilder();
+        builder.append("Type 10 with message [");
         for (int i = 0; i < data.length; ) {
+            if (i != 0) {
+                builder.append(", ");
+            }
             var value = data[i];
             var size = data[i + 1];
             var copy = Arrays.copyOfRange(data, i, i + 2 + size);
 
             if (value == 11 || value == 16) {
-                builder.append(decodeVariable(copy));
+                builder.append(decodeVariable(copy)); // recursive
             }
-            var nextT = i + 2 + size;
-            if (nextT > data.length) {
-                break;
-            }
-            i = nextT;
+            i = i + 2 + size;
         }
-        return builder.toString();
+        return builder.append("].").toString();
     }
 }
