@@ -73,7 +73,7 @@ public class OperationReader {
     private Optional<Integer> checkNumber(final String input) {
         try {
             final int value = Integer.parseInt(input.trim());
-            if (value > 127 || value < 0) {
+            if (value > 127 || value < -128) {
                 return Optional.empty();
             }
             return Optional.of(value);
