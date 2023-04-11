@@ -14,7 +14,6 @@ public class AnswerDecoder {
         if (buffer.length > 2) {
             final var type = buffer[0];
             final var size = buffer[1];
-            System.out.println("Type:" + type + ", Size:" + size);
             final var value = Arrays.copyOfRange(buffer, 2, 2 + size);
             switch (type) {
                 case 10:

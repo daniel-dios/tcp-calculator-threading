@@ -1,4 +1,5 @@
 rootProject.name = 'tcp-calculator-threading'
 include 'server'
 include 'client'
+include 'golden'
 
