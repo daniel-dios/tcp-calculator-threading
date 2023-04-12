@@ -11,7 +11,7 @@ public class GoldenTest {
 
     @Test
     void shouldEncodeDecodeSuccess() {
-        final var bytes = encoder.encodeSuccess(10);
+        final var bytes = encoder.encodeNumber16(10);
         final var actual = decoder.decodeVariable(bytes);
 
         assertThat(actual)
@@ -20,7 +20,7 @@ public class GoldenTest {
 
     @Test
     void shouldEncodeDecodeFailure() {
-        final var bytes = encoder.encodeFailure(10, "Can't divide by 0.");
+        final var bytes = encoder.encode(10, "Can't divide by 0.");
         final var actual = decoder.decodeVariable(bytes);
 
         assertThat(actual)

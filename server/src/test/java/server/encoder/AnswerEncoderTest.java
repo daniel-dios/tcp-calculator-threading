@@ -15,8 +15,8 @@ class AnswerEncoderTest {
 
     public static Stream<Arguments> inputExpected() {
         return Stream.of(
-                Arguments.of(-525, new byte[]{16, 8, -1, -1, -1, -1, -1, -1, -3, -13}),
-                Arguments.of(260, new byte[]{16, 8, 0, 0, 0, 0, 0, 0, 1, 4})
+                Arguments.of(-525, new byte[]{10, 10, 16, 8, (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 253, (byte) 243}),
+                Arguments.of(260, new byte[]{10, 10, 16, 8, 0, 0, 0, 0, 0, 0, 1, 4})
         );
     }
 
@@ -26,13 +26,13 @@ class AnswerEncoderTest {
             final long input,
             final byte[] expected
     ) {
-        assertThat(answerEncoder.encodeSuccess(input))
+        assertThat(answerEncoder.encode(input))
                 .isEqualTo(expected);
     }
 
     @Test
     void shouldEncodeFailure() {
-        assertThat(answerEncoder.encodeFailure(-525, "Can not divide by 0"))
+        assertThat(answerEncoder.encode(-525, "Can not divide by 0"))
                 .isEqualTo(toByteArray(
                         10, 31, 11, 19, 67, 97, 110, 32, 110, 111, 116, 32, 100, 105, 118, 105, 100,
                         101, 32, 98, 121, 32, 48, 16, 8, -1, -1, -1, -1, -1, -1, -3, -13

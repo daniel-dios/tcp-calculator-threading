@@ -74,26 +74,26 @@ public class Server {
                             accumulator.accumulate(solution.result);
                             logger.info("Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
 
-                            out.write(answerEncoder.encodeSuccess(accumulator.getValue()));
+                            out.write(answerEncoder.encode(accumulator.getValue()));
                             logger.info("Answered: " + accumulator);
                         } catch (Accumulator.AccumulatorMax e) {
                             logger.info("Accumulator will overflow in max value, replying with previous value: " + accumulator.getValue());
-                            out.write(answerEncoder.encodeFailure(accumulator.getValue(), "Accumulator can't increase with the operation result."));
+                            out.write(answerEncoder.encode(accumulator.getValue(), "Accumulator can't increase with the operation result."));
                             logger.info("Answered: " + accumulator);
                         } catch (Accumulator.AccumulatorMin e) {
                             System.out.println("Accumulator will overflow in min value, replying with previous value: " + accumulator.getValue());
-                            out.write(answerEncoder.encodeFailure(accumulator.getValue(), "Accumulator can't decrease with the operation result."));
+                            out.write(answerEncoder.encode(accumulator.getValue(), "Accumulator can't decrease with the operation result."));
                             logger.info("Answered: " + accumulator);
                         }
                     } else {
                         logger.info("Problem solving: " + operation.toReadableFormat() + ", error: " + solution.reason);
                         logger.info("Accumulator was (didn't change): " + accumulator.getValue());
 
-                        out.write(answerEncoder.encodeFailure(accumulator.getValue(), solution.reason));
-                        logger.info("Answer sent: type 10 (type 16, value" + accumulator + "; type 11, reason:" + solution.reason);
+                        out.write(answerEncoder.encode(accumulator.getValue(), solution.reason));
+                        logger.info("Answer sent: type 10 (type 16, value" + accumulator + "; type 11, reason:" + solution.reason+")");
                     }
                 } else {
-                    out.write(answerEncoder.encodeFailure(accumulator.getValue(), "invalid input"));
+                    out.write(answerEncoder.encode(accumulator.getValue(), "invalid input"));
                     logger.info("Answered with a 0 due to invalid input.");
                 }
             }
@@ -117,7 +117,7 @@ public class Server {
         private final String header;
 
         public ClientPrinter(final InetAddress inetAddress, final int port) {
-            this.header = "[IP '" + inetAddress + "', Port '" + port + "'] ";
+            this.header = "[IP '" + inetAddress.getHostAddress() + "', Port '" + port + "'] ";
         }
 
         public void info(String message) {

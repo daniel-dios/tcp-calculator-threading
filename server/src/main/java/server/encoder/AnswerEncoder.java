@@ -13,7 +13,32 @@ public class AnswerEncoder {
     public final int CAPACITY_POSITION = 1;
     public final int VALUE_POSITION = 2;
 
-    public byte[] encodeSuccess(final long value) {
+    public byte[] encode(
+            final long value
+    ) {
+        final var accumulator = encodeNumber16(value);
+        return ByteBuffer.allocate(2 + accumulator.length)
+                .put((byte) 10)
+                .put((byte) (accumulator.length))
+                .put(accumulator)
+                .array();
+    }
+
+    public byte[] encode(
+            final long value,
+            final String text
+    ) {
+        final var accumulator = encodeNumber16(value);
+        final var reason = encodeMessage11(text);
+        return ByteBuffer.allocate(2 + accumulator.length + reason.length)
+                .put((byte) 10)
+                .put((byte) (accumulator.length + reason.length))
+                .put(reason)
+                .put(accumulator)
+                .array();
+    }
+
+    private byte[] encodeNumber16(final long value) {
         final var valueInBigEndian = ByteBuffer.allocate(CAPACITY)
                 .order(BIG_ENDIAN)
                 .putLong(value)
@@ -28,21 +53,7 @@ public class AnswerEncoder {
         return output;
     }
 
-    public byte[] encodeFailure(
-            final long value,
-            final String text
-    ) {
-        final var accumulator = encodeSuccess(value);
-        final var reason = encodeMessage(text);
-        return ByteBuffer.allocate(2 + accumulator.length + reason.length)
-                .put((byte) 10)
-                .put((byte) (accumulator.length + reason.length))
-                .put(reason)
-                .put(accumulator)
-                .array();
-    }
-
-    private byte[] encodeMessage(final String reason) {
+    private byte[] encodeMessage11(final String reason) {
         final var bytes = reason.getBytes(StandardCharsets.UTF_8);
         return ByteBuffer.allocate(2 + bytes.length)
                 .put((byte) 11)
