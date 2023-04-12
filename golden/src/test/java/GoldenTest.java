@@ -11,11 +11,13 @@ public class GoldenTest {
 
     @Test
     void shouldEncodeDecodeSuccess() {
-        final var bytes = encoder.encodeNumber16(10);
+        final var bytes = encoder.encode(10);
         final var actual = decoder.decodeVariable(bytes);
 
         assertThat(actual)
-                .isEqualTo("Type 16 with accumulator [10]");
+                .isEqualTo("Type 10 with message [\n\t" +
+                        "Type 16 with accumulator [10]\n" +
+                        "].");
     }
 
     @Test
