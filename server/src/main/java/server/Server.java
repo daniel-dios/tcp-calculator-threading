@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -63,38 +64,27 @@ public class Server {
                 final var decode = operationDecoder.decode(buffer);
                 if (decode.isPresent()) {
                     final var operation = decode.get();
-
-                    logger.info("Received from client the operation: " + operation.toReadableFormat());
+                    logger.info("Received the operation: " + operation.toReadableFormat());
                     final var solution = operation.solve();
                     if (solution.success) {
                         logger.info("Solved: " + operation.toReadableFormat() + " = " + solution);
-
-                        final var before = accumulator.getValue();
                         try {
+                            System.out.println("Accumulator before adding solution is:" + accumulator.getValue());
                             accumulator.accumulate(solution.result);
-                            logger.info("Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
-
+                            logger.info("Accumulator after accumulation is: " + accumulator.getValue());
                             out.write(answerEncoder.encode(accumulator.getValue()));
                             logger.info("Answered: " + accumulator);
                         } catch (Accumulator.AccumulatorMax e) {
-                            logger.info("Accumulator will overflow in max value, replying with previous value: " + accumulator.getValue());
-                            out.write(answerEncoder.encode(accumulator.getValue(), "Accumulator can't increase with the operation result."));
-                            logger.info("Answered: " + accumulator);
+                            sendError(logger, out, accumulator.getValue(), "Accumulator can't increase with the operation result.");
                         } catch (Accumulator.AccumulatorMin e) {
-                            System.out.println("Accumulator will overflow in min value, replying with previous value: " + accumulator.getValue());
-                            out.write(answerEncoder.encode(accumulator.getValue(), "Accumulator can't decrease with the operation result."));
-                            logger.info("Answered: " + accumulator);
+                            sendError(logger, out, accumulator.getValue(), "Accumulator can't decrease with the operation result.");
                         }
                     } else {
                         logger.info("Problem solving: " + operation.toReadableFormat() + ", error: " + solution.reason);
-                        logger.info("Accumulator was (didn't change): " + accumulator.getValue());
-
-                        out.write(answerEncoder.encode(accumulator.getValue(), solution.reason));
-                        logger.info("Answer sent: type 10 (type 16, value" + accumulator + "; type 11, reason:" + solution.reason+")");
+                        sendError(logger, out, accumulator.getValue(), solution.reason);
                     }
                 } else {
-                    out.write(answerEncoder.encode(accumulator.getValue(), "invalid input"));
-                    logger.info("Answered with a 0 due to invalid input.");
+                    sendError(logger, out, accumulator.getValue(), "invalid input");
                 }
             }
         } catch (IOException e) {
@@ -102,6 +92,16 @@ public class Server {
         } finally {
             logger.info("Connection closed with client.");
         }
+    }
+
+    private void sendError(
+            final ClientPrinter logger,
+            final OutputStream out,
+            final long accumulatorValue,
+            final String reason
+    ) throws IOException {
+        out.write(answerEncoder.encode(accumulatorValue, reason));
+        logger.info("Answered accumulator: " + accumulatorValue + ", error: " + reason);
     }
 
     private Optional<ServerSocket> tryToOpenSocket(final int port) {
