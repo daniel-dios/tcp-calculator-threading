@@ -11,11 +11,11 @@ public class Accumulator {
         this.value = value;
     }
 
-    public void accumulate(long input) {
+    public void accumulate(long input) throws AccumulatorMax, AccumulatorMin {
         if (input >= 0 && MAX_VALUE - input < value) {
-            value = MAX_VALUE;
+            throw new AccumulatorMax();
         } else if (input < 0 && MIN_VALUE - input > value) {
-            value = MIN_VALUE;
+            throw new AccumulatorMin();
         } else {
             value += input;
         }
@@ -28,5 +28,11 @@ public class Accumulator {
 
     public long getValue() {
         return this.value;
+    }
+
+    static class AccumulatorMax extends Exception {
+    }
+
+    static class AccumulatorMin extends Exception {
     }
 }

@@ -14,8 +14,11 @@ public class OperationReader {
     public static final int MIN_VALUE = -128;
     public static final int MAX_VALUE = 127;
 
-    public Optional<Operation> parse(final String s) {
-        final var split = s.split(" ");
+    public Optional<Operation> parse(final String input) {
+        final var split = input.trim().split(" ");
+        if (split.length == 1 && split[0].contains(Symbol.FACT.toSymbol())) {
+            return checkNumber(split[0].split(Symbol.FACT.toSymbol())[0]).map(Fact::new);
+        }
         if (split.length == 2 && Symbol.FACT.toSymbol().equals(split[1])) {
             return checkNumber(split[0]).map(Fact::new);
         }
@@ -67,7 +70,7 @@ public class OperationReader {
         System.out.println("\tValid format is infix annotation, symbols are +, -, /, %, x, !");
         System.out.println("\tNumbers range is [-128, 127] inclusive.");
         System.out.println("\tInfix annotation: number symbol number (with spaces between number and number and no spaces before 1st number and after 2nd)");
-        System.out.println("\tExamples: 1 x 2, 1 / 2, 1 % 2, 1 - 2, 1 + 2, 1!");
+        System.out.println("\tExamples: 1 x 2, 1 / 2, 1 % 2, 1 - 2, 1 + 2, 1 ! or 1!");
     }
 
     private Optional<Integer> checkNumber(final String input) {

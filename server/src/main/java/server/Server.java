@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
@@ -28,22 +29,21 @@ public class Server {
     public void startListeningBlocking() {
         tryToOpenSocket(params.getPort())
                 .ifPresentOrElse(
-                        socket -> {
-                            try {
-                                acceptingConnections(socket);
-                            } catch (IOException e) {
-                                System.out.println("Problem with " + e.getMessage());
-                            }
-                        },
-                        () -> System.out.println("Impossible to connect"));
+                        this::acceptingConnections,
+                        () -> System.out.println("Impossible to connect")
+                );
         System.out.println("See you soon.");
     }
 
-    private void acceptingConnections(final ServerSocket socket) throws IOException {
-        while (true) {
-            System.out.println("Listening...");
-            final var clientSocket = socket.accept();
-            new Thread(() -> handleNewConnection(clientSocket)).start();
+    private void acceptingConnections(final ServerSocket socket) {
+        try {
+            while (true) {
+                System.out.println("Listening...");
+                final Socket clientSocket = socket.accept();
+                new Thread(() -> handleNewConnection(clientSocket)).start();
+            }
+        } catch (IOException e) {
+            System.out.println("Problem with " + e.getMessage());
         }
     }
 
@@ -51,8 +51,8 @@ public class Server {
             final Socket clientSocket
     ) {
         final var accumulator = new Accumulator(0);
-        final var info = "[IP '" + clientSocket.getInetAddress() + "', Port '" + clientSocket.getPort() + "'] ";
-        System.out.println(info + "connection accepted!");
+        final var logger = new ClientPrinter(clientSocket.getInetAddress(), clientSocket.getPort());
+        logger.info("connection accepted!");
         try (
                 final var in = clientSocket.getInputStream();
                 final var out = clientSocket.getOutputStream()
@@ -64,35 +64,43 @@ public class Server {
                 if (decode.isPresent()) {
                     final var operation = decode.get();
 
-                    System.out.println(info + "Received from client the operation: " + operation.toReadableFormat());
+                    logger.info("Received from client the operation: " + operation.toReadableFormat());
                     final var solution = operation.solve();
                     if (solution.success) {
-                        System.out.println(info + "Solved: " + operation.toReadableFormat() + " = " + solution);
+                        logger.info("Solved: " + operation.toReadableFormat() + " = " + solution);
 
                         final var before = accumulator.getValue();
-                        accumulator.accumulate(solution.result);
-                        System.out.println(info + "Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
+                        try {
+                            accumulator.accumulate(solution.result);
+                            logger.info("Accumulator was: " + before + " and after accumulation is: " + accumulator.getValue());
 
-                        out.write(answerEncoder.encodeSuccess(accumulator.getValue()));
-                        System.out.println(info + "Answered: " + accumulator);
+                            out.write(answerEncoder.encodeSuccess(accumulator.getValue()));
+                            logger.info("Answered: " + accumulator);
+                        } catch (Accumulator.AccumulatorMax e) {
+                            logger.info("Accumulator will overflow in max value, replying with previous value: " + accumulator.getValue());
+                            out.write(answerEncoder.encodeFailure(accumulator.getValue(), "Accumulator can't increase with the operation result."));
+                            logger.info("Answered: " + accumulator);
+                        } catch (Accumulator.AccumulatorMin e) {
+                            System.out.println("Accumulator will overflow in min value, replying with previous value: " + accumulator.getValue());
+                            out.write(answerEncoder.encodeFailure(accumulator.getValue(), "Accumulator can't decrease with the operation result."));
+                            logger.info("Answered: " + accumulator);
+                        }
                     } else {
-                        System.out.println(info + "Problem solving: " + operation.toReadableFormat() + ", error: " + solution.reason);
-
-                        accumulator.accumulate(solution.result);
-                        System.out.println(info + "Accumulator was (didn't change): " + accumulator.getValue());
+                        logger.info("Problem solving: " + operation.toReadableFormat() + ", error: " + solution.reason);
+                        logger.info("Accumulator was (didn't change): " + accumulator.getValue());
 
                         out.write(answerEncoder.encodeFailure(accumulator.getValue(), solution.reason));
-                        System.out.println(info + "Answer sent: type 10 (type 16, value" + accumulator + "; type 11, reason:" + solution.reason);
+                        logger.info("Answer sent: type 10 (type 16, value" + accumulator + "; type 11, reason:" + solution.reason);
                     }
                 } else {
                     out.write(answerEncoder.encodeFailure(accumulator.getValue(), "invalid input"));
-                    System.out.println(info + "Answered with a 0 due to invalid input.");
+                    logger.info("Answered with a 0 due to invalid input.");
                 }
             }
         } catch (IOException e) {
-            System.out.println(info + "IOException with client reason:" + e.getMessage());
+            logger.info("IOException with client reason:" + e.getMessage());
         } finally {
-            System.out.println(info + "Connection closed with client.");
+            logger.info("Connection closed with client.");
         }
     }
 
@@ -102,6 +110,18 @@ public class Server {
         } catch (IOException e) {
             System.out.println("Could not open the socket on port: " + port + ", reason: " + e.getMessage());
             return Optional.empty();
+        }
+    }
+
+    private static class ClientPrinter {
+        private final String header;
+
+        public ClientPrinter(final InetAddress inetAddress, final int port) {
+            this.header = "[IP '" + inetAddress + "', Port '" + port + "'] ";
+        }
+
+        public void info(String message) {
+            System.out.println(header + message);
         }
     }
 }

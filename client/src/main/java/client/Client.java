@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 
@@ -99,9 +100,9 @@ public class Client {
 
     private void printInstructions() {
         System.out.println(SEPARATOR);
-        System.out.println("Please insert the operation in infix notation: ->A o B<- ('o' between spaces)");
+        System.out.println("Please insert the operation in infix notation: A o B ('o' between space)");
         System.out.println("Numbers (A, B): must be in range [" + OperationReader.MIN_VALUE + ", " + OperationReader.MAX_VALUE + "]");
-        System.out.println("Operations (o): Any of:" + stream(Symbol.values()).map(Symbol::toSymbol) + ")");
+        System.out.println("Operations (o): Any of:" + stream(Symbol.values()).map(Symbol::toSymbol).collect(Collectors.toList()) + ")");
         System.out.println("Example:");
         System.out.println("1 + 2");
         System.out.println("Type QUIT for exit.");

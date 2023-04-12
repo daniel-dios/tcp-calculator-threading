@@ -46,9 +46,8 @@ class OperationReaderTest {
 
                 Arguments.of("1 !", new Fact(1)),
                 Arguments.of("-1 !", new Fact(-1)),
-
-
-
+                Arguments.of("1!", new Fact(1)),
+                Arguments.of("-1!", new Fact(-1)),
 
                 Arguments.of("127 x 127", new Mult(127, 127)),
                 Arguments.of("-128 x 127", new Mult(-128, 127)),
@@ -71,7 +70,66 @@ class OperationReaderTest {
                 Arguments.of("127 - -128", new Subs(127, -128)),
                 Arguments.of("-128 - -128", new Subs(-128, -128)),
                 Arguments.of("127 !", new Fact(127)),
-                Arguments.of("-128 !", new Fact(-128))
+
+
+                Arguments.of("        -128 !        ", new Fact(-128)),
+                Arguments.of("        127!      ", new Fact(127)),
+                Arguments.of("        -128!         ", new Fact(-128)),
+
+                Arguments.of("        1 x 2         ", new Mult(1, 2)),
+                Arguments.of("        -1 x 2        ", new Mult(-1, 2)),
+                Arguments.of("        1 x -2        ", new Mult(1, -2)),
+                Arguments.of("        -1 x -2       ", new Mult(-1, -2)),
+
+                Arguments.of("        1 + 2         ", new Sum(1, 2)),
+                Arguments.of("        -1 + 2        ", new Sum(-1, 2)),
+                Arguments.of("        1 + -2        ", new Sum(1, -2)),
+                Arguments.of("        -1 + -2       ", new Sum(-1, -2)),
+
+                Arguments.of("        1 / 2         ", new Div(1, 2)),
+                Arguments.of("        -1 / 2        ", new Div(-1, 2)),
+                Arguments.of("        1 / -2        ", new Div(1, -2)),
+                Arguments.of("        -1 / -2       ", new Div(-1, -2)),
+
+                Arguments.of("        1 % 2         ", new DivRest(1, 2)),
+                Arguments.of("        -1 % 2        ", new DivRest(-1, 2)),
+                Arguments.of("        1 % -2        ", new DivRest(1, -2)),
+                Arguments.of("        -1 % -2       ", new DivRest(-1, -2)),
+
+                Arguments.of("        1 - 2         ", new Subs(1, 2)),
+                Arguments.of("        -1 - 2        ", new Subs(-1, 2)),
+                Arguments.of("        1 - -2        ", new Subs(1, -2)),
+                Arguments.of("        -1 - -2       ", new Subs(-1, -2)),
+
+                Arguments.of("        1 !       ", new Fact(1)),
+                Arguments.of("        -1 !      ", new Fact(-1)),
+                Arguments.of("        1!        ", new Fact(1)),
+                Arguments.of("        -1!       ", new Fact(-1)),
+
+                Arguments.of("        127 x 127         ", new Mult(127, 127)),
+                Arguments.of("        -128 x 127        ", new Mult(-128, 127)),
+                Arguments.of("        127 x -128        ", new Mult(127, -128)),
+                Arguments.of("        -128 x -128       ", new Mult(-128, -128)),
+                Arguments.of("        127 + 127         ", new Sum(127, 127)),
+                Arguments.of("        -128 + 127        ", new Sum(-128, 127)),
+                Arguments.of("        127 + -128        ", new Sum(127, -128)),
+                Arguments.of("        -128 + -128       ", new Sum(-128, -128)),
+                Arguments.of("        127 / 127         ", new Div(127, 127)),
+                Arguments.of("        -128 / 127        ", new Div(-128, 127)),
+                Arguments.of("        127 / -128        ", new Div(127, -128)),
+                Arguments.of("        -128 / -128       ", new Div(-128, -128)),
+                Arguments.of("        127 % 127         ", new DivRest(127, 127)),
+                Arguments.of("        -128 % 127        ", new DivRest(-128, 127)),
+                Arguments.of("        127 % -128        ", new DivRest(127, -128)),
+                Arguments.of("        -128 % -128       ", new DivRest(-128, -128)),
+                Arguments.of("        127 - 127         ", new Subs(127, 127)),
+                Arguments.of("        -128 - 127        ", new Subs(-128, 127)),
+                Arguments.of("        127 - -128        ", new Subs(127, -128)),
+                Arguments.of("        -128 - -128       ", new Subs(-128, -128)),
+                Arguments.of("        127 !         ", new Fact(127)),
+                Arguments.of("        -128 !        ", new Fact(-128)),
+                Arguments.of("        127!      ", new Fact(127)),
+                Arguments.of("        -128!         ", new Fact(-128))
         );
     }
 
@@ -102,10 +160,6 @@ class OperationReaderTest {
                 Arguments.of("1 --2"),
                 Arguments.of("-1 --2"),
 
-                Arguments.of("1!"),
-                Arguments.of("-1!"),
-
-
                 Arguments.of("1x 2"),
                 Arguments.of("-1x 2"),
                 Arguments.of("1x -2"),
@@ -131,7 +185,6 @@ class OperationReaderTest {
                 Arguments.of("1- -2"),
                 Arguments.of("-1- -2"),
 
-
                 Arguments.of("1x2"),
                 Arguments.of("-1x2"),
                 Arguments.of("1x-2"),
@@ -156,9 +209,6 @@ class OperationReaderTest {
                 Arguments.of("-1-2"),
                 Arguments.of("1--2"),
                 Arguments.of("-1--2"),
-
-                Arguments.of("1!"),
-                Arguments.of("-1!"),
 
                 Arguments.of("1 x 128"),
                 Arguments.of("128 x 2"),
@@ -219,11 +269,8 @@ class OperationReaderTest {
     @ParameterizedTest
     @MethodSource("getExpected")
     void shouldReturnExpected(final String input, final Operation expected) {
-        final var actual = operationReader.parse(input);
-
-        assertThat(actual)
-                .isPresent();
-        assertThat(actual.get())
+        assertThat(operationReader.parse(input))
+                .get()
                 .usingRecursiveComparison()
                 .isEqualTo(expected);
     }
@@ -231,18 +278,14 @@ class OperationReaderTest {
     @ParameterizedTest
     @MethodSource("getWrong")
     void shouldReturnEmpty(final String input) {
-        final var actual = operationReader.parse(input);
-
-        assertThat(actual)
+        assertThat(operationReader.parse(input))
                 .isEmpty();
     }
 
     @ParameterizedTest
     @MethodSource("getWrongOverRange")
     void shouldReturnEmptyWhenOutOfRange(final String input) {
-        final var actual = operationReader.parse(input);
-
-        assertThat(actual)
+        assertThat(operationReader.parse(input))
                 .isEmpty();
     }
 }
