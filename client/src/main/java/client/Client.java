@@ -17,7 +17,6 @@ import static java.util.Arrays.stream;
 
 public class Client {
 
-    public static final int FINISH_SIG = -1;
     public static final String SEPARATOR = "------------------------------------------------------------------";
     public static final Duration TIMEOUT_FOR_ESTABLISH = Duration.ofSeconds(15);
     private final ClientParameters p;
@@ -77,24 +76,25 @@ public class Client {
                 System.out.println("Problem writing to the server, try again.");
                 continue;
             }
-
-            try {
-                final var firstType = dataInputStream.readByte();
-                final var size = dataInputStream.readByte();
-                final var payload = dataInputStream.readNBytes(size);
-                final var buffer = ByteBuffer.allocate(2 + size)
-                        .put(firstType)
-                        .put(size)
-                        .put(payload)
-                        .array();
-                System.out.println("Answer from server: " + answerDecoder.decodeVariable(buffer));
-
-            } catch (IOException e) {
-                System.out.println("Problem reading.");
-            }
-
+            readAnswerFromServer(dataInputStream);
         }
         System.out.println("Connection ended.");
+    }
+
+    private void readAnswerFromServer(final DataInputStream dataInputStream) {
+        try {
+            final var firstType = dataInputStream.readByte();
+            final var size = dataInputStream.readByte();
+            final var payload = dataInputStream.readNBytes(size);
+            final var buffer = ByteBuffer.allocate(2 + size)
+                    .put(firstType)
+                    .put(size)
+                    .put(payload)
+                    .array();
+            System.out.println("Answer from server: " + answerDecoder.decodeVariable(buffer));
+        } catch (IOException e) {
+            System.out.println("Problem reading.");
+        }
     }
 
     private void printInstructions() {

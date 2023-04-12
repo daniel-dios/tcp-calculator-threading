@@ -8,8 +8,6 @@ import client.operation.impl.Subs;
 import client.operation.impl.Sum;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class OperationReader {
 
@@ -22,8 +20,8 @@ public class OperationReader {
             return checkNumber(split[0]).map(Fact::new);
         }
         if (split.length == 3 && Symbol.FACT.toSymbol().equals(split[1])) {
-            System.out.println();
-            System.out.println("Factorial must be only one number.");
+            System.out.println("\tFactorial must be only one number.");
+            printInstructions();
             return Optional.empty();
         }
         if (split.length == 3) {
@@ -32,63 +30,56 @@ public class OperationReader {
                     .filter(symbol -> symbol.toSymbol().equals(split[1]))
                     .findFirst();
             if (maybeSymbol.isEmpty()) {
-                System.out.println("There is no operation simbol in infix with spaces.");
+                System.out.println("\tThere is no operation symbol in infix with spaces.");
+                printInstructions();
                 return Optional.empty();
             }
-            final var maybeFirstNumber = checkNumber(split[0]);
-            final var maybeSecondNumber = checkNumber(split[2]);
-            if (maybeFirstNumber.isPresent() && maybeSecondNumber.isPresent()) {
+            final var first = checkNumber(split[0]);
+            final var second = checkNumber(split[2]);
+            if (first.isPresent() && second.isPresent()) {
                 switch (maybeSymbol.get()) {
                     case SUM:
-                        return getOperationTwoNumbers(maybeFirstNumber.get(), maybeSecondNumber.get(), Sum::new);
+                        return Optional.of(new Sum(first.get(), second.get()));
                     case SUBS:
-                        return getOperationTwoNumbers(maybeFirstNumber.get(), maybeSecondNumber.get(), Subs::new);
+                        return Optional.of(new Subs(first.get(), second.get()));
                     case DIV:
-                        return getOperationTwoNumbers(maybeFirstNumber.get(), maybeSecondNumber.get(), Div::new);
+                        return Optional.of(new Div(first.get(), second.get()));
                     case DIV_REST:
-                        return getOperationTwoNumbers(maybeFirstNumber.get(), maybeSecondNumber.get(), DivRest::new);
+                        return Optional.of(new DivRest(first.get(), second.get()));
                     case MULT:
-                        return getOperationTwoNumbers(maybeFirstNumber.get(), maybeSecondNumber.get(), Mult::new);
-                    case FACT:
-                        System.out.println("Unreachable code.");
+                        return Optional.of(new Mult(first.get(), second.get()));
+                    default:
+                        System.out.println("\tThis symbol between numbers not accepted, try with: x, /, %, -");
+                        printInstructions();
                         return Optional.empty();
                 }
             } else {
-                System.out.println("They are not numbers in the valid range");
+                System.out.println("\tThey are not numbers in the valid range");
+                printInstructions();
                 return Optional.empty();
             }
         }
+        printInstructions();
         return Optional.empty();
     }
 
-    private Optional<Operation> getOperationTwoNumbers(
-            final Integer first,
-            final Integer second,
-            final BiFunction<Integer, Integer, Operation> consumer
-    ) {
-        return Optional.of(consumer.apply(first, second));
-    }
-
-    private Optional<Operation> getOperation(
-            final String[] split,
-            final Function<Integer, Operation> consumer
-    ) {
-        if (split.length != 1) {
-            return Optional.empty();
-        }
-        final var first = checkNumber(split[0]);
-        return first.map(consumer);
+    private void printInstructions() {
+        System.out.println("\tValid format is infix annotation, symbols are +, -, /, %, x, !");
+        System.out.println("\tNumbers range is [-128, 127] inclusive.");
+        System.out.println("\tInfix annotation: number symbol number (with spaces between number and number and no spaces before 1st number and after 2nd)");
+        System.out.println("\tExamples: 1 x 2, 1 / 2, 1 % 2, 1 - 2, 1 + 2, 1!");
     }
 
     private Optional<Integer> checkNumber(final String input) {
         try {
             final int value = Integer.parseInt(input.trim());
             if (value > MAX_VALUE || value < MIN_VALUE) {
+                System.out.println(input + " is out of range.");
                 return Optional.empty();
             }
             return Optional.of(value);
         } catch (NumberFormatException ex) {
-            System.out.println("Is not a valid number");
+            System.out.println(input + " is not a valid number.");
             return Optional.empty();
         }
     }
