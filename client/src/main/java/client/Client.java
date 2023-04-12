@@ -2,6 +2,7 @@ package client;
 
 import client.answer.AnswerDecoder;
 import client.operation.OperationReader;
+import client.operation.Symbol;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,6 +12,8 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.Scanner;
+
+import static java.util.Arrays.stream;
 
 public class Client {
 
@@ -96,9 +99,9 @@ public class Client {
 
     private void printInstructions() {
         System.out.println(SEPARATOR);
-        System.out.println("Please insert the operation in infix notation: 'A o B' (with spaces or not)");
-        System.out.println("Numbers (A, B): must be in range [0, 127]");
-        System.out.println("Operations (o): +, -, x, /, %, !)");
+        System.out.println("Please insert the operation in infix notation: ->A o B<- ('o' between spaces)");
+        System.out.println("Numbers (A, B): must be in range [" + OperationReader.MIN_VALUE + ", " + OperationReader.MAX_VALUE + "]");
+        System.out.println("Operations (o): Any of:" + stream(Symbol.values()).map(Symbol::toSymbol) + ")");
         System.out.println("Example:");
         System.out.println("1 + 2");
         System.out.println("Type QUIT for exit.");

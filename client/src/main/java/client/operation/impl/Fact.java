@@ -25,4 +25,9 @@ public class Fact implements Operation {
         encoded[2] = (byte) first;
         return encoded;
     }
+
+    @Override
+    public String toString() {
+        return toReadableFormat();
+    }
 }

@@ -20,46 +20,179 @@ class OperationReaderTest {
     public static Stream<Arguments> getExpected() {
         return Stream.of(
                 Arguments.of("1 x 2", new Mult(1, 2)),
-                Arguments.of("0 + 2", new Sum(0, 2)),
-                Arguments.of("2 - 1", new Subs(2, 1)),
-                Arguments.of("3 / 1", new Div(3, 1)),
-                Arguments.of("6 % 3", new DivRest(6, 3)),
-                Arguments.of("3 !", new Fact(3)),
-                Arguments.of("1x2", new Mult(1, 2)),
-                Arguments.of("0+2", new Sum(0, 2)),
-                Arguments.of("2-1", new Subs(2, 1)),
-                Arguments.of("3/1", new Div(3, 1)),
-                Arguments.of("6%3", new DivRest(6, 3)),
-                Arguments.of("3!", new Fact(3))
+                Arguments.of("-1 x 2", new Mult(-1, 2)),
+                Arguments.of("1 x -2", new Mult(1, -2)),
+                Arguments.of("-1 x -2", new Mult(-1, -2)),
+
+                Arguments.of("1 + 2", new Sum(1, 2)),
+                Arguments.of("-1 + 2", new Sum(-1, 2)),
+                Arguments.of("1 + -2", new Sum(1, -2)),
+                Arguments.of("-1 + -2", new Sum(-1, -2)),
+
+                Arguments.of("1 / 2", new Div(1, 2)),
+                Arguments.of("-1 / 2", new Div(-1, 2)),
+                Arguments.of("1 / -2", new Div(1, -2)),
+                Arguments.of("-1 / -2", new Div(-1, -2)),
+
+                Arguments.of("1 % 2", new DivRest(1, 2)),
+                Arguments.of("-1 % 2", new DivRest(-1, 2)),
+                Arguments.of("1 % -2", new DivRest(1, -2)),
+                Arguments.of("-1 % -2", new DivRest(-1, -2)),
+
+                Arguments.of("1 - 2", new Subs(1, 2)),
+                Arguments.of("-1 - 2", new Subs(-1, 2)),
+                Arguments.of("1 - -2", new Subs(1, -2)),
+                Arguments.of("-1 - -2", new Subs(-1, -2)),
+
+                Arguments.of("1 !", new Fact(1)),
+                Arguments.of("-1 !", new Fact(-1)),
+
+
+
+
+                Arguments.of("127 x 127", new Mult(127, 127)),
+                Arguments.of("-128 x 127", new Mult(-128, 127)),
+                Arguments.of("127 x -128", new Mult(127, -128)),
+                Arguments.of("-128 x -128", new Mult(-128, -128)),
+                Arguments.of("127 + 127", new Sum(127, 127)),
+                Arguments.of("-128 + 127", new Sum(-128, 127)),
+                Arguments.of("127 + -128", new Sum(127, -128)),
+                Arguments.of("-128 + -128", new Sum(-128, -128)),
+                Arguments.of("127 / 127", new Div(127, 127)),
+                Arguments.of("-128 / 127", new Div(-128, 127)),
+                Arguments.of("127 / -128", new Div(127, -128)),
+                Arguments.of("-128 / -128", new Div(-128, -128)),
+                Arguments.of("127 % 127", new DivRest(127, 127)),
+                Arguments.of("-128 % 127", new DivRest(-128, 127)),
+                Arguments.of("127 % -128", new DivRest(127, -128)),
+                Arguments.of("-128 % -128", new DivRest(-128, -128)),
+                Arguments.of("127 - 127", new Subs(127, 127)),
+                Arguments.of("-128 - 127", new Subs(-128, 127)),
+                Arguments.of("127 - -128", new Subs(127, -128)),
+                Arguments.of("-128 - -128", new Subs(-128, -128)),
+                Arguments.of("127 !", new Fact(127)),
+                Arguments.of("-128 !", new Fact(-128))
         );
     }
 
     public static Stream<Arguments> getWrongOverRange() {
         return Stream.of(
-                Arguments.of("1 x 128"),
-                Arguments.of("128 + 2"),
-                Arguments.of("2 - 128"),
-                Arguments.of("128 / 1"),
-                Arguments.of("6 % -3"),
-                Arguments.of("128 !"),
-                Arguments.of("128x2"),
-                Arguments.of("0+211"),
-                Arguments.of("-2-1"),
-                Arguments.of("200/1"),
-                Arguments.of("6%300"),
-                Arguments.of("128!"),
-                Arguments.of("-1 x 2"),
-                Arguments.of("0 + -2"),
-                Arguments.of("-2 - 1"),
-                Arguments.of("-03 / 1"),
-                Arguments.of("-6 % 3"),
-                Arguments.of("-3 !"),
+                Arguments.of("1 x2"),
+                Arguments.of("-1 x2"),
+                Arguments.of("1 x-2"),
+                Arguments.of("-1 x-2"),
+
+                Arguments.of("1 +2"),
+                Arguments.of("-1 +2"),
+                Arguments.of("1 +-2"),
+                Arguments.of("-1 +-2"),
+
+                Arguments.of("1 /2"),
+                Arguments.of("-1 /2"),
+                Arguments.of("1 /-2"),
+                Arguments.of("-1 /-2"),
+
+                Arguments.of("1 %2"),
+                Arguments.of("-1 %2"),
+                Arguments.of("1 %-2"),
+                Arguments.of("-1 %-2"),
+
+                Arguments.of("1 -2"),
+                Arguments.of("-1 -2"),
+                Arguments.of("1 --2"),
+                Arguments.of("-1 --2"),
+
+                Arguments.of("1!"),
+                Arguments.of("-1!"),
+
+
+                Arguments.of("1x 2"),
+                Arguments.of("-1x 2"),
+                Arguments.of("1x -2"),
+                Arguments.of("-1x -2"),
+
+                Arguments.of("1+ 2"),
+                Arguments.of("-1+ 2"),
+                Arguments.of("1+ -2"),
+                Arguments.of("-1+ -2"),
+
+                Arguments.of("1/ 2"),
+                Arguments.of("-1/ 2"),
+                Arguments.of("1/ -2"),
+                Arguments.of("-1/ -2"),
+
+                Arguments.of("1% 2"),
+                Arguments.of("-1% 2"),
+                Arguments.of("1% -2"),
+                Arguments.of("-1% -2"),
+
+                Arguments.of("1- 2"),
+                Arguments.of("-1- 2"),
+                Arguments.of("1- -2"),
+                Arguments.of("-1- -2"),
+
+
+                Arguments.of("1x2"),
                 Arguments.of("-1x2"),
-                Arguments.of("0+-2"),
-                Arguments.of("-2-1"),
-                Arguments.of("-3/1"),
-                Arguments.of("6%-3"),
-                Arguments.of("-3!")
+                Arguments.of("1x-2"),
+                Arguments.of("-1x-2"),
+
+                Arguments.of("1+2"),
+                Arguments.of("-1+2"),
+                Arguments.of("1+-2"),
+                Arguments.of("-1+-2"),
+
+                Arguments.of("1/2"),
+                Arguments.of("-1/2"),
+                Arguments.of("1/-2"),
+                Arguments.of("-1/-2"),
+
+                Arguments.of("1%2"),
+                Arguments.of("-1%2"),
+                Arguments.of("1%-2"),
+                Arguments.of("-1%-2"),
+
+                Arguments.of("1-2"),
+                Arguments.of("-1-2"),
+                Arguments.of("1--2"),
+                Arguments.of("-1--2"),
+
+                Arguments.of("1!"),
+                Arguments.of("-1!"),
+
+                Arguments.of("1 x 128"),
+                Arguments.of("128 x 2"),
+
+                Arguments.of("2 - 128"),
+                Arguments.of("128 - 127"),
+
+                Arguments.of("2 + 128"),
+                Arguments.of("128 + 127"),
+
+                Arguments.of("128 / 1"),
+                Arguments.of("12 / 128"),
+
+                Arguments.of("128 % 1"),
+                Arguments.of("12 % 128"),
+
+                Arguments.of("128 !"),
+
+                Arguments.of("1 x -129"),
+                Arguments.of("-129 x 2"),
+
+                Arguments.of("2 - -129"),
+                Arguments.of("-129 - 127"),
+
+                Arguments.of("2 + -129"),
+                Arguments.of("-129 + 127"),
+
+                Arguments.of("-129 / 1"),
+                Arguments.of("12 / -129"),
+
+                Arguments.of("-129 % 1"),
+                Arguments.of("12 % -129"),
+
+                Arguments.of("-129 !")
         );
     }
 
