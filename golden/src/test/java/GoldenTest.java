@@ -15,9 +15,7 @@ public class GoldenTest {
         final var actual = decoder.decodeVariable(bytes);
 
         assertThat(actual)
-                .isEqualTo("Type 10 with message [\n\t" +
-                        "Type 16 with accumulator [10]\n" +
-                        "].");
+                .isEqualTo("Message: [Accumulator: [10]].");
     }
 
     @Test
@@ -26,9 +24,6 @@ public class GoldenTest {
         final var actual = decoder.decodeVariable(bytes);
 
         assertThat(actual)
-                .isEqualTo("Type 10 with message [\n\t" +
-                        "Type 11 with message [Can't divide by 0.],\n\t" +
-                        "Type 16 with accumulator [10]\n" +
-                        "].");
+                .isEqualTo("Message: [Text: [Can't divide by 0.], Accumulator: [10]].");
     }
 }
