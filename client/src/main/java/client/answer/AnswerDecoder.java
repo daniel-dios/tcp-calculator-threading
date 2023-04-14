@@ -28,14 +28,14 @@ public class AnswerDecoder {
     }
 
     public String decodeNumber16(final byte[] buffer) {
-        return "Type 16 with accumulator [" + ByteBuffer
+        return "Accumulator: [" + ByteBuffer
                 .wrap(Arrays.copyOfRange(buffer, 0, buffer.length))
                 .getLong() + "]";
     }
 
     private String decodeText11(final byte[] value) {
         try {
-            return "Type 11 with message [" + StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(value)) + "]";
+            return "Text: [" + StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(value)) + "]";
         } catch (IllegalStateException | CharacterCodingException e) {
             return "Message is not UTF encoded";
         }
@@ -48,10 +48,10 @@ public class AnswerDecoder {
         // 19 --> [T,19,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,-  ,- ,-,-,-,- ,-  ,-  ,16,8,0,0,0,0,0,0,0,5]
 
         final var builder = new StringBuilder();
-        builder.append("Type 10 with message [\n\t");
+        builder.append("Message: [");
         for (int i = 0; i < data.length; ) {
             if (i != 0) {
-                builder.append(",\n\t");
+                builder.append(", ");
             }
             var value = data[i];
             var size = data[i + 1];
@@ -62,6 +62,6 @@ public class AnswerDecoder {
             }
             i = i + 2 + size;
         }
-        return builder.append("\n].").toString();
+        return builder.append("].").toString();
     }
 }

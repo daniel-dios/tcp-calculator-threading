@@ -14,15 +14,15 @@ class AnswerDecoderTest {
         final byte[] answer = toByteArray(255, 255, 255, 255, 255, 255, 253, 243);
 
         assertThat(answerDecoder.decodeNumber16(answer))
-                .isEqualTo("Type 16 with accumulator [-525]");
+                .isEqualTo("Accumulator: [-525]");
     }
 
     @Test
     void shouldDecodeType16WithValue() {
-        byte[] answer = toByteArray(16, 8, 255, 255, 255, 255, 255, 255, 253, 243);
+        byte[] answer = toByteArray(10, 10, 16, 8, 255, 255, 255, 255, 255, 255, 253, 243);
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 16 with accumulator [-525]");
+                .isEqualTo("Message: [Accumulator: [-525]].");
     }
 
     @Test
@@ -33,7 +33,7 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 10 with message [\n\tType 11 with message [Can not divide by 0],\n\tType 16 with accumulator [5]\n].");
+                .isEqualTo("Message: [Text: [Can not divide by 0], Accumulator: [5]].");
     }
 
     @Test
@@ -44,7 +44,7 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 10 with message [\n\tType 16 with accumulator [5],\n\tType 11 with message [Can not divide by 0]\n].");
+                .isEqualTo("Message: [Accumulator: [5], Text: [Can not divide by 0]].");
     }
 
     @Test
@@ -59,6 +59,27 @@ class AnswerDecoderTest {
         );
 
         assertThat(answerDecoder.decodeVariable(answer))
-                .isEqualTo("Type 10 with message [\n\tType 11 with message [ab],\n\tType 16 with accumulator [12],\n\tType 16 with accumulator [5],\n\tType 11 with message [cd],\n\tType 11 with message [e]\n].");
+                .isEqualTo("Message: [Text: [ab], Accumulator: [12], Accumulator: [5], Text: [cd], Text: [e]].");
+    }
+
+    @Test
+    void shouldRunText() {
+        byte[] answer = toByteArray(
+                10, 4,
+                11, 2, 97, 98
+        );
+
+        assertThat(answerDecoder.decodeVariable(answer))
+                .isEqualTo("Message: [Text: [ab]].");
+    }
+
+    @Test
+    void shouldRunOnlyText() {
+        byte[] answer = toByteArray(
+                11, 2, 97, 98
+        );
+
+        assertThat(answerDecoder.decodeVariable(answer))
+                .isEqualTo("Text: [ab]");
     }
 }
