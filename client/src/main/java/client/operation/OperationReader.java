@@ -17,15 +17,19 @@ public class OperationReader {
     public Optional<Operation> parse(final String input) {
         final var split = input.trim().split(" ");
         if (split.length == 1 && split[0].contains(Symbol.FACT.toSymbol())) {
-            return checkNumber(split[0].split(Symbol.FACT.toSymbol())[0]).map(Fact::new);
+            final var integer = checkNumber(split[0].split(Symbol.FACT.toSymbol())[0]);
+            if (integer.isPresent()) {
+                return integer.map(Fact::new);
+            } else {
+                return printInstructionsAndReturnEmpty();
+            }
         }
         if (split.length == 2 && Symbol.FACT.toSymbol().equals(split[1])) {
             return checkNumber(split[0]).map(Fact::new);
         }
         if (split.length == 3 && Symbol.FACT.toSymbol().equals(split[1])) {
             System.out.println("\tFactorial must be only one number.");
-            printInstructions();
-            return Optional.empty();
+            return printInstructionsAndReturnEmpty();
         }
         if (split.length == 3) {
             final var maybeSymbol = Arrays
@@ -34,8 +38,7 @@ public class OperationReader {
                     .findFirst();
             if (maybeSymbol.isEmpty()) {
                 System.out.println("\tThere is no operation symbol in infix with spaces.");
-                printInstructions();
-                return Optional.empty();
+                return printInstructionsAndReturnEmpty();
             }
             final var first = checkNumber(split[0]);
             final var second = checkNumber(split[2]);
@@ -53,24 +56,23 @@ public class OperationReader {
                         return Optional.of(new Mult(first.get(), second.get()));
                     default:
                         System.out.println("\tThis symbol between numbers not accepted, try with: x, /, %, -");
-                        printInstructions();
-                        return Optional.empty();
+                        return printInstructionsAndReturnEmpty();
                 }
             } else {
-                System.out.println("\tThey are not numbers in the valid range");
-                printInstructions();
-                return Optional.empty();
+                System.out.println("\tThere are not numbers in the valid range");
+                return printInstructionsAndReturnEmpty();
             }
         }
-        printInstructions();
-        return Optional.empty();
+        return printInstructionsAndReturnEmpty();
     }
 
-    private void printInstructions() {
+    private Optional<Operation> printInstructionsAndReturnEmpty() {
         System.out.println("\tValid format is infix annotation, symbols are +, -, /, %, x, !");
         System.out.println("\tNumbers range is [-128, 127] inclusive.");
-        System.out.println("\tInfix annotation: number symbol number (with spaces between number and number and no spaces before 1st number and after 2nd)");
+        System.out.println("\tInfix annotation: number symbol number (with spaces between");
+        System.out.println("\tnumber and number and no spaces before 1st number and after 2nd)");
         System.out.println("\tExamples: 1 x 2, 1 / 2, 1 % 2, 1 - 2, 1 + 2, 1 ! or 1!");
+        return Optional.empty();
     }
 
     private Optional<Integer> checkNumber(final String input) {

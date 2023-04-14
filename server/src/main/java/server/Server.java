@@ -69,7 +69,7 @@ public class Server {
                     if (solution.success) {
                         logger.info("Solved: " + operation.toReadableFormat() + " = " + solution);
                         try {
-                            System.out.println("Accumulator before adding solution is:" + accumulator.getValue());
+                            logger.info("Accumulator before adding solution is:" + accumulator.getValue());
                             accumulator.accumulate(solution.result);
                             logger.info("Accumulator after accumulation is: " + accumulator.getValue());
                             out.write(answerEncoder.encode(accumulator.getValue()));
